@@ -10,7 +10,7 @@ def struct(obj, limit=3):
     c = iter(obj)
     q = []
 
-    for i in range(min(limit, len(obj))):
+    for _ in range(min(limit, len(obj))):
         q.append(type(next(c, None)))
     a = [struct(obj_) for obj_ in obj]
     a = q
