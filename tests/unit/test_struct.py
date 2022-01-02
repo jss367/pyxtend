@@ -1,5 +1,5 @@
 import numpy as np
-from pyxtend import struct
+from src.pyxtend import struct
 
 small_set = {1, "this"}
 res = struct(small_set)
