@@ -20,6 +20,13 @@ def struct(obj, limit=3):
     return {type(obj): a}
 
 
-def vprint(text: str, verbose: bool) -> None:
-    if verbose:
-        print(text)
+def vprint(*text: str) -> None:
+    """
+    Print the text if verbose=True in outer context.
+    Print nothing if verbose=False or is undefined.
+    """
+    try:
+        if verbose:
+            print(*text)
+    except NameError:
+        pass
