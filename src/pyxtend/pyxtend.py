@@ -1,3 +1,4 @@
+import contextlib
 from typing import Iterable
 
 
@@ -25,8 +26,6 @@ def vprint(*text: str) -> None:
     Print the text if verbose=True in outer context.
     Print nothing if verbose=False or is undefined.
     """
-    try:
+    with contextlib.suppress(NameError):
         if verbose:
             print(*text)
-    except NameError:
-        pass
