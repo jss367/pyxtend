@@ -14,7 +14,8 @@ def struct(obj, limit=3):
         if len(obj) > limit:
             a.append(f"...{len(obj)} total")
         return {type(obj): a}
-
+    if isinstance(obj, tf.Tensor):
+        return obj.shape
     a = [struct(obj_) for obj_ in obj[:limit]]
     if len(obj) > limit:
         a.append(f"...{len(obj)} total")
