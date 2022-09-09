@@ -57,3 +57,14 @@ assert (
 #     str(res)
 #     == "{<class 'numpy.ndarray'>: [<class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, '...5 total']}"
 # )
+
+
+## TF Tensors
+
+tensor = pd.Series([[tf.constant(1, shape=(1))],[tf.constant(1, shape=(1))],[tf.constant(1, shape=(1))], [tf.constant(1, shape=(1))]])
+
+res = struct(tensor)
+
+assert res == {pd.Series: [{list: [tf.TensorShape([1])]}, {list: [tf.TensorShape([1])]}, {list: [tf.TensorShape([1])]}, '...4 total']}
+
+
