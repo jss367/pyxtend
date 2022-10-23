@@ -1,6 +1,6 @@
 ## Adding New Package to PyPI
 
-* Update version in setup.cfg
+* Update version number in setup.cfg
 * Upgrade build
  * (Windows): `py -m pip install --upgrade build`
  * (Mac/Linux): `python3 -m pip install --upgrade build`
