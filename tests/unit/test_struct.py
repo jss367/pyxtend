@@ -115,7 +115,7 @@ def test_torch_tensor():
 def test_tf_tensor():
     tf_tensor = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], dtype=tf.float32)
     result = struct(tf_tensor)
-    assert result == {"EagerTensor": ["float32, shape=(2, 3)"]}
+    assert result == {"EagerTensor": ["<dtype: 'float32'>, shape=(2, 3)"]}
 
 
 def test_tf_tensors():
@@ -132,8 +132,9 @@ def test_tf_tensors():
 
     assert (
         str(result)
-        == "{'Series': [{'list': [{'EagerTensor': ['int32, shape=(1,)']}]}, {'list': [{'EagerTensor': ['int32,"
-        " shape=(1,)']}]}, {'list': [{'EagerTensor': ['int32, shape=(1,)']}]}, '...4 total']}"
+        == "{'Series': [{'list': [{'EagerTensor': [\"<dtype: 'int32'>, shape=(1,)\"]}]}, {'list': [{'EagerTensor':"
+        " [\"<dtype: 'int32'>, shape=(1,)\"]}]}, {'list': [{'EagerTensor': [\"<dtype: 'int32'>, shape=(1,)\"]}]},"
+        " '...4 total']}"
     )
 
 
