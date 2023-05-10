@@ -5,6 +5,7 @@ from typing import Any, Iterable, Union
 import numpy as np
 import tensorflow as tf
 import torch
+from shapely.geometry.base import BaseGeometry
 
 
 def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
@@ -33,6 +34,9 @@ def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
         else:
             inner_structure = struct(obj.item(0), level + 1)
         return {f"{type(obj).__name__}": [f"{obj.dtype}, shape={obj.shape}"]}
+    elif isinstance(obj, BaseGeometry):
+        coords = np.array(obj.exterior.coords)
+        return {f"{type(obj).__name__}": [f"float64, shape={coords.shape}"]}
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
             inner_structure = [struct(x, level + 1) for x in obj]

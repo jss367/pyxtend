@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import torch
+from shapely.geometry import Polygon
 
 from src.pyxtend import struct
 
@@ -134,3 +135,9 @@ def test_tf_tensors():
         == "{'Series': [{'list': [{'EagerTensor': ['int32, shape=(1,)']}]}, {'list': [{'EagerTensor': ['int32,"
         " shape=(1,)']}]}, {'list': [{'EagerTensor': ['int32, shape=(1,)']}]}, '...4 total']}"
     )
+
+
+def test_shapely_polygon():
+    polygon = Polygon([(0, 0), (1, 1), (1, 0)])
+    result = struct(polygon)
+    assert result == {"Polygon": ["float64, shape=(4, 2)"]}  # starting point is added as end point
