@@ -2,7 +2,6 @@ from collections.abc import Iterable
 from typing import Any, Union
 
 import numpy as np
-from shapely.geometry.base import BaseGeometry
 
 
 def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
@@ -28,8 +27,8 @@ def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
     elif isinstance(obj, np.ndarray):
         inner_structure = "empty" if obj.size == 0 else struct(obj.item(0), level + 1)
         return {f"{type(obj).__name__}": [f"{obj.dtype}, shape={obj.shape}"]}
-    elif isinstance(obj, BaseGeometry):
-        coords = np.array(obj.exterior.coords)
+    elif obj_type_name == "Polygon":
+        coords = np.array(getattr(obj, "exterior", {}).coords if hasattr(obj, "exterior") else [])
         return {f"{type(obj).__name__}": [f"float64, shape={coords.shape}"]}
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
