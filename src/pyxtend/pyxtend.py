@@ -29,10 +29,7 @@ def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
     elif isinstance(obj, tf.Tensor):
         return {f"{type(obj).__name__}": [f"{obj.dtype.name}, shape={tuple(obj.shape)}"]}
     elif isinstance(obj, np.ndarray):
-        if obj.size == 0:  # Check if the array is empty
-            inner_structure = "empty"
-        else:
-            inner_structure = struct(obj.item(0), level + 1)
+        inner_structure = "empty" if obj.size == 0 else struct(obj.item(0), level + 1)
         return {f"{type(obj).__name__}": [f"{obj.dtype}, shape={obj.shape}"]}
     elif isinstance(obj, BaseGeometry):
         coords = np.array(obj.exterior.coords)
