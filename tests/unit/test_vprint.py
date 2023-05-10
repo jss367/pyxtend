@@ -1,6 +1,9 @@
+from src.pyxtend import vprint
+
 """
-Need to make it work in the following case
+Still TODO
 """
 
-def fun(verbose=True):
+
+def test_vprint(verbose=True):
     vprint(100)
