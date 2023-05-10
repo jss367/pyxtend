@@ -25,7 +25,7 @@ def test_empty_list():
 def test_small_set():
     small_set = {1, "this"}
     result = struct(small_set)
-    assert result == {"set": ["int", "str"]} or result == {"set": ["str", "int"]}
+    assert result in [{"set": ["int", "str"]}, {"set": ["str", "int"]}]
 
 
 def test_large_set():
@@ -84,8 +84,8 @@ def test_large_dict():
 
 
 def test_tuple():
-    test_tuple = (1, 2, 3, 4, 5, 6)
-    result = struct(test_tuple)
+    medium_tuple = (1, 2, 3, 4, 5, 6)
+    result = struct(medium_tuple)
     assert result == {"tuple": ["int", "int", "int", "...6 total"]}
 
 
@@ -100,7 +100,7 @@ def test_empty_numpy():
     assert result == {"ndarray": ["float64, shape=(0,)"]}
 
 
-## PyTorch Tensors
+# PyTorch Tensors
 
 
 def test_torch_tensor():
@@ -109,7 +109,7 @@ def test_torch_tensor():
     assert result == {"Tensor": ["torch.float32, shape=(2, 3)"]}
 
 
-## TF Tensors
+# TF Tensors
 
 
 def test_tf_tensor():
@@ -121,10 +121,10 @@ def test_tf_tensor():
 def test_tf_tensors():
     tensor = pd.Series(
         [
-            [tf.constant(1, shape=(1))],
-            [tf.constant(1, shape=(1))],
-            [tf.constant(1, shape=(1))],
-            [tf.constant(1, shape=(1))],
+            [tf.constant(1, shape=1)],
+            [tf.constant(1, shape=1)],
+            [tf.constant(1, shape=1)],
+            [tf.constant(1, shape=1)],
         ]
     )
 

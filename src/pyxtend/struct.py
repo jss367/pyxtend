@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, Union
 
-import numpy as np
-
 
 def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
     """
@@ -24,12 +22,15 @@ def struct(obj: Any, level: int = 0, limit: int = 3) -> Union[str, dict]:
         return "str"
     elif obj_type_name in ["Tensor", "EagerTensor"]:
         return {obj_type_name: [f"{obj.dtype}, shape={tuple(getattr(obj, 'shape', ()))}"]}
-    elif isinstance(obj, np.ndarray):
+    elif obj_type_name == "ndarray":
         inner_structure = "empty" if obj.size == 0 else struct(obj.item(0), level + 1)
-        return {f"{type(obj).__name__}": [f"{obj.dtype}, shape={obj.shape}"]}
+        shape = tuple(obj.shape)
+        dtype = obj.dtype.name
+        return {f"{type(obj).__name__}": [f"{dtype}, shape={shape}"]}
     elif obj_type_name == "Polygon":
-        coords = np.array(getattr(obj, "exterior", {}).coords if hasattr(obj, "exterior") else [])
-        return {f"{type(obj).__name__}": [f"float64, shape={coords.shape}"]}
+        coords = list(getattr(obj, "exterior", {}).coords) if hasattr(obj, "exterior") else []
+        shape = (len(coords), len(coords[0]) if coords else 0)
+        return {f"{type(obj).__name__}": [f"float64, shape={shape}"]}
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
             inner_structure = [struct(x, level + 1) for x in obj]
