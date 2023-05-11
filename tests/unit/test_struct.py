@@ -17,6 +17,11 @@ def test_small_list():
     assert result == {"list": ["int", "int", "int"]}
 
 
+def test_small_list_examples():
+    result = struct([1, 2, 3], examples=True)
+    assert result == {"list": [1, 2, 3]}
+
+
 def test_empty_list():
     result = struct([])
     assert result == {"list": []}
@@ -34,8 +39,19 @@ def test_large_set():
     assert result == {"set": ["int", "int", "int", "...10 total"]}
 
 
+def test_large_set_examples():
+    large_set = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+    result = struct(large_set, examples=True)
+    assert result == {"set": [1, 2, 3, "...10 total"]}
+
+
 def test_empty_set():
     result = struct(set())
+    assert result == {"set": []}
+
+
+def test_empty_set_examples():
+    result = struct(set(), examples=True)
     assert result == {"set": []}
 
 
@@ -61,6 +77,12 @@ def test_mixed_list():  # udpate this one
     assert result == {"list": ["int", "str", "str", "...4 total"]}
 
 
+def test_mixed_list_examples():  # udpate this one
+    mixed_list = [1, "this", "sam", [4, 3, "here"]]
+    result = struct(mixed_list, examples=True)
+    assert result == {"list": [1, "this", "sam", "...4 total"]}
+
+
 def test_list_in_list():  # update this one
     list_in_list = [1, [[1, 2], 3, "here"]]
     result = struct(list_in_list)
@@ -70,6 +92,12 @@ def test_list_in_list():  # update this one
 def test_numpy_array():  # maybe include three?
     np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
     result = struct(np_arr)
+    assert result == {"ndarray": ["int32, shape=(7,)"]}
+
+
+def test_numpy_array_examples():  # maybe include three?
+    np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
+    result = struct(np_arr, examples=True)
     assert result == {"ndarray": ["int32, shape=(7,)"]}
 
 
