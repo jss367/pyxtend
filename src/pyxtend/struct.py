@@ -32,6 +32,14 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         coords = list(getattr(obj, "exterior", {}).coords) if hasattr(obj, "exterior") else []
         shape = (len(coords), len(coords[0]) if coords else 0)
         return {f"{type(obj).__name__}": [f"float64, shape={shape}"]}
+    elif isinstance(obj, torch.nn.Module):
+        # Get all parameters of the nn.Module
+        params = list(obj.named_parameters())
+        if examples:
+            inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
+        else:
+            inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
+        return {type(obj).__name__: inner_structure}
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
             if examples:
