@@ -20,3 +20,6 @@ Better support for BatchEncoding. Example:
     )
 
     encoded_text = tokenizer(texts, padding=True, truncation=True, return_tensors="pt")
+
+
+Would be nice if it gave more info on dataframes... number of columns, rows, etc. Maybe something like df.summary()?
