@@ -13,6 +13,15 @@ return "unsupported"  # type(obj).__name__ or {type(obj).__name__: 'unsupported'
 
 * Add github actions to run tests
 
+* This is wrong:
+```
+        if examples:
+            inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
+        else:
+            inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
+
+```
+
 Better support for BatchEncoding. Example:
     texts = ["this is my test text", "this is another test text"] * 100
 
