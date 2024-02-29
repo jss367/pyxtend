@@ -1,4 +1,5 @@
 ## TODO
+
 * Needs better performance on cases like np.zeros((10000, 2, 256, 256, 3))
   * Should it only do the extra thing for sets?
 
@@ -25,6 +26,11 @@ Better support for BatchEncoding. Example:
 Would be nice if it gave more info on dataframes... number of columns, rows, etc. Maybe something like df.summary()?
 
 
-Fix this bug:
+### Bug fixes
+
 <img width="401" alt="image" src="https://github.com/jss367/pyxtend/assets/3067731/b86912c0-3283-4bfd-8f9a-14418e0d44ed">
 
+
+### Add Support
+
+pandas groups
