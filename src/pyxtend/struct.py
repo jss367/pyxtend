@@ -53,3 +53,46 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
             return {type(obj).__name__: "..."}
     else:
         return "unsupported"
+
+
+
+
+def concise_groupby_summary(groupby_object):
+    """
+    Provide a concise summary of a DataFrameGroupBy object, focusing on key statistics
+    and a couple of example groups.
+
+    Parameters:
+    - groupby_object: A pandas DataFrameGroupBy object.
+
+    Returns:
+    None
+    """
+    # Total number of groups
+    print(f"Total groups: {len(groupby_object)}\n")
+
+    # Summary statistics of group sizes
+    group_sizes = groupby_object.size()
+    print("Group sizes summary:")
+    print(group_sizes.describe())
+    print("\n")
+
+    # Display a couple of example groups (first two groups as examples)
+    example_groups = groupby_object.apply(lambda x: x.head(1))  # Adjust based on the size and readability of your data
+    print("Examples of groups (first row per group):")
+    print(example_groups.head(2))
+    print("\n")
+
+    # Global aggregated statistics for numeric columns (mean, median)
+    print("Global mean values for numeric columns:")
+    try:
+        print(groupby_object.mean().mean())  # Mean of means for each group
+    except TypeError:
+        print("No numeric columns to calculate mean.")
+    print("\n")
+
+    print("Global median values for numeric columns:")
+    try:
+        print(groupby_object.median().median())  # Median of medians for each group
+    except TypeError:
+        print("No numeric columns to calculate median.")
