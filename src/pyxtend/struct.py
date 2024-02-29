@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, Union
-
+import pandas as pd
 
 def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> Union[str, dict]:
     """
@@ -40,6 +40,8 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         else:
             inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
         return {type(obj).__name__: inner_structure}
+    elif isinstance(obj, pd.core.groupby.generic.DataFrameGroupBy):
+        groupby_summary(obj)
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
             if examples:
@@ -57,10 +59,10 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
 
 
 
-def concise_groupby_summary(groupby_object):
+def groupby_summary(groupby_object):
     """
-    Provide a concise summary of a DataFrameGroupBy object, focusing on key statistics
-    and a couple of example groups.
+    Provide a comprehensive summary of a DataFrameGroupBy object, focusing on key statistics,
+    examples of groups, and overall group description including total items and average items per group.
 
     Parameters:
     - groupby_object: A pandas DataFrameGroupBy object.
@@ -68,8 +70,14 @@ def concise_groupby_summary(groupby_object):
     Returns:
     None
     """
-    # Total number of groups
-    print(f"Total groups: {len(groupby_object)}\n")
+    # Total number of groups and total items across all groups
+    num_groups = groupby_object.ngroups
+    total_items = sum(len(group) for _, group in groupby_object)
+    average_items_per_group = total_items / num_groups if num_groups > 0 else 0
+
+    print(f"Total number of items: {total_items}")
+    print(f"Total number of groups: {num_groups}")
+    print(f"Average number of items per group: {average_items_per_group:.2f}\n")
 
     # Summary statistics of group sizes
     group_sizes = groupby_object.size()
@@ -77,22 +85,30 @@ def concise_groupby_summary(groupby_object):
     print(group_sizes.describe())
     print("\n")
 
-    # Display a couple of example groups (first two groups as examples)
-    example_groups = groupby_object.apply(lambda x: x.head(1))  # Adjust based on the size and readability of your data
     print("Examples of groups (first row per group):")
-    print(example_groups.head(2))
+    # Initialize a counter
+    examples_shown = 0
+    # Iterate over the groupby object and print the first row of the first n_examples groups
+    for _, group in groupby_object:
+        print(group.head(1))
+        examples_shown += 1
+        if examples_shown >= examples_shown:
+            break
     print("\n")
+
 
     # Global aggregated statistics for numeric columns (mean, median)
     print("Global mean values for numeric columns:")
     try:
-        print(groupby_object.mean().mean())  # Mean of means for each group
+        # Explicitly specify numeric_only=True
+        print(groupby_object.mean(numeric_only=True).mean(numeric_only=True))  # Mean of means for each group
     except TypeError:
         print("No numeric columns to calculate mean.")
     print("\n")
 
     print("Global median values for numeric columns:")
     try:
-        print(groupby_object.median().median())  # Median of medians for each group
+        # Explicitly specify numeric_only=True
+        print(groupby_object.median(numeric_only=True).median(numeric_only=True))  # Median of medians for each group
     except TypeError:
         print("No numeric columns to calculate median.")
