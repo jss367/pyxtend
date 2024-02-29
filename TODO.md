@@ -7,6 +7,11 @@ If it's unsupported, should it be:
 return "unsupported"  # type(obj).__name__ or {type(obj).__name__: 'unsupported'}
 
 
+* Should these return the response or just print them?
+
+* Verbose mode that shows which path is went down?
+
+* Add github actions to run tests
 
 Better support for BatchEncoding. Example:
     texts = ["this is my test text", "this is another test text"] * 100
@@ -34,3 +39,6 @@ Would be nice if it gave more info on dataframes... number of columns, rows, etc
 ### Add Support
 
 pandas groups
+
+
+
