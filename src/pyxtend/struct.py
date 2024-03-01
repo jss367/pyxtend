@@ -40,6 +40,7 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         shape = (len(coords), len(coords[0]) if coords else 0)
         return {f"{type(obj).__name__}": [f"float64, shape={shape}"]}
     elif TORCH_AVAILABLE and isinstance(obj, torch.nn.Module):
+        # Can I do object name here as well?
         # Get all parameters of the nn.Module
         params = list(obj.named_parameters())
         if examples:
