@@ -1,6 +1,13 @@
 from collections.abc import Iterable
 from typing import Any, Union
+
 import pandas as pd
+
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
 
 def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> Union[str, dict]:
     """
@@ -32,7 +39,7 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         coords = list(getattr(obj, "exterior", {}).coords) if hasattr(obj, "exterior") else []
         shape = (len(coords), len(coords[0]) if coords else 0)
         return {f"{type(obj).__name__}": [f"float64, shape={shape}"]}
-    elif isinstance(obj, torch.nn.Module):
+    elif TORCH_AVAILABLE and isinstance(obj, torch.nn.Module):
         # Get all parameters of the nn.Module
         params = list(obj.named_parameters())
         if examples:
