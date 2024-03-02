@@ -3,11 +3,6 @@ from typing import Any, Union
 
 import pandas as pd
 
-try:
-    import torch
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
 
 def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> Union[str, dict]:
     """
