@@ -87,16 +87,14 @@ def test_mixed_list_examples():  # udpate this one
 def test_list_in_list():  # update this one
     list_in_list = [1, [[1, 2], 3, "here"]]
     result = struct(list_in_list)
-    assert result == {
-        "list": ["int", {"list": [{"list": ["int", "int"]}, "int", "str"]}]
-    }
+    assert result == {"list": ["int", {"list": [{"list": ["int", "int"]}, "int", "str"]}]}
 
 
 def test_numpy_array():  # maybe include three?
     np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
     result = struct(np_arr)
     # Reponse will depend on default interger type of the platform
-    expected_dtype = 'int32' if np.dtype('int').itemsize == 4 else 'int64'
+    expected_dtype = "int32" if np.dtype("int").itemsize == 4 else "int64"
     assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)"]}
 
 
@@ -104,7 +102,7 @@ def test_numpy_array_examples():  # maybe include three?
     np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
     result = struct(np_arr, examples=True)
     # Reponse will depend on default interger type of the platform
-    expected_dtype = 'int32' if np.dtype('int').itemsize == 4 else 'int64'
+    expected_dtype = "int32" if np.dtype("int").itemsize == 4 else "int64"
     assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)"]}
 
 
@@ -176,6 +174,67 @@ def test_tf_tensors():
 def test_shapely_polygon():
     polygon = Polygon([(0, 0), (1, 1), (1, 0)])
     result = struct(polygon)
-    assert result == {
-        "Polygon": ["float64, shape=(4, 2)"]
-    }  # starting point is added as end point
+    assert result == {"Polygon": ["float64, shape=(4, 2)"]}  # starting point is added as end point
+
+
+# Make some custom classes for testing
+
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+class Shape:
+    def __init__(self, name, points):
+        self.name = name
+        self.points = points
+
+
+class MyClass:
+    def __init__(self, a, b, some_list):
+        self.attribute1 = a
+        self.attribute2 = b
+        self.attribute3 = some_list
+        self.my_method = lambda x: x * 2
+
+
+def test_simple_object():
+    point = Point(10, 20)
+    result = struct(point)
+    expected = {"Point": {"x": "int", "y": "int"}}
+    assert result == expected
+
+
+def test_nested_objects():
+    shape = Shape("rectangle", [Point(0, 0), Point(10, 0), Point(10, 5), Point(0, 5)])
+    result = struct(shape)
+    expected = {
+        "Shape": {
+            "name": "str",
+            "points": {
+                "list": [
+                    {"Point": {"x": "int", "y": "int"}},
+                    {"Point": {"x": "int", "y": "int"}},
+                    {"Point": {"x": "int", "y": "int"}},
+                    "...4 total",
+                ]
+            },
+        }
+    }
+    assert result == expected  # You'll need to define the expected output
+
+
+def test_mixed_types():
+    my_obj = MyClass(5, "hello", [1, 2.5, "world"])
+    result = struct(my_obj)
+    expected = {
+        "MyClass": {
+            "attribute1": "int",
+            "attribute2": "str",
+            "attribute3": {"list": ["int", "float", "str"]},
+            "my_method": {"function": {}},
+        }
+    }
+    assert result == expected

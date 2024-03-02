@@ -49,9 +49,9 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         else:
             return {type(obj).__name__: "..."}
     else:
-        return "unsupported"
-
-
+        # Handle custom objects
+        attributes = {key: struct(getattr(obj, key), level + 1) for key in dir(obj) if not key.startswith("_")}
+        return {obj_type_name: attributes}
 
 
 def groupby_summary(groupby_object):
@@ -90,7 +90,6 @@ def groupby_summary(groupby_object):
         if examples_shown >= examples_shown:
             break
     print("\n")
-
 
     # Global aggregated statistics for numeric columns (mean, median)
     print("Global mean values for numeric columns:")
