@@ -4,7 +4,8 @@ import tensorflow as tf
 import torch
 from shapely.geometry import Polygon
 
-from src.pyxtend import struct
+# from src.pyxtend import struct # this fails on my mac
+from pyxtend import struct  # this works on my mac
 
 
 def test_string():
@@ -86,19 +87,25 @@ def test_mixed_list_examples():  # udpate this one
 def test_list_in_list():  # update this one
     list_in_list = [1, [[1, 2], 3, "here"]]
     result = struct(list_in_list)
-    assert result == {"list": ["int", {"list": [{"list": ["int", "int"]}, "int", "str"]}]}
+    assert result == {
+        "list": ["int", {"list": [{"list": ["int", "int"]}, "int", "str"]}]
+    }
 
 
 def test_numpy_array():  # maybe include three?
     np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
     result = struct(np_arr)
-    assert result == {"ndarray": ["int32, shape=(7,)"]}
+    # Reponse will depend on default interger type of the platform
+    expected_dtype = 'int32' if np.dtype('int').itemsize == 4 else 'int64'
+    assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)"]}
 
 
 def test_numpy_array_examples():  # maybe include three?
     np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
     result = struct(np_arr, examples=True)
-    assert result == {"ndarray": ["int32, shape=(7,)"]}
+    # Reponse will depend on default interger type of the platform
+    expected_dtype = 'int32' if np.dtype('int').itemsize == 4 else 'int64'
+    assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)"]}
 
 
 def test_dict():
@@ -169,4 +176,6 @@ def test_tf_tensors():
 def test_shapely_polygon():
     polygon = Polygon([(0, 0), (1, 1), (1, 0)])
     result = struct(polygon)
-    assert result == {"Polygon": ["float64, shape=(4, 2)"]}  # starting point is added as end point
+    assert result == {
+        "Polygon": ["float64, shape=(4, 2)"]
+    }  # starting point is added as end point
