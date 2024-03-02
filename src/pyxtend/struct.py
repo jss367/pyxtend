@@ -29,6 +29,7 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
     elif isinstance(obj, str):
         return "str"
     elif obj_type_name in ["Tensor", "EagerTensor"]:
+        # This works for both TensorFlow and PyTorch
         return {obj_type_name: [f"{obj.dtype}, shape={tuple(getattr(obj, 'shape', ()))}"]}
     elif obj_type_name == "ndarray":
         inner_structure = "empty" if obj.size == 0 else struct(obj.item(0), level + 1)
@@ -39,15 +40,6 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         coords = list(getattr(obj, "exterior", {}).coords) if hasattr(obj, "exterior") else []
         shape = (len(coords), len(coords[0]) if coords else 0)
         return {f"{type(obj).__name__}": [f"float64, shape={shape}"]}
-    elif TORCH_AVAILABLE and isinstance(obj, torch.nn.Module):
-        # Can I do object name here as well?
-        # Get all parameters of the nn.Module
-        params = list(obj.named_parameters())
-        if examples:
-            inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
-        else:
-            inner_structure = {name: struct(param.data, level + 1, limit, examples) for name, param in params}
-        return {type(obj).__name__: inner_structure}
     elif isinstance(obj, pd.core.groupby.generic.DataFrameGroupBy):
         groupby_summary(obj)
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
