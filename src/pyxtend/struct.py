@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, Union
 
-import pandas as pd
-
 
 def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> Union[str, dict]:
     """

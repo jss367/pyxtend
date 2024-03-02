@@ -99,6 +99,14 @@ def test_numpy_array():  # maybe include three?
     assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)"]}
 
 
+def test_large_numpy_array():
+    np_arr = np.zeros((10000, 2, 256, 256, 3))
+    result = struct(np_arr)
+    # Reponse will depend on default interger type of the platform
+    expected_dtype = "float32" if np.dtype("float").itemsize == 4 else "float64"
+    assert result == {"ndarray": [f"{expected_dtype}, shape=(10000, 2, 256, 256, 3)"]}
+
+
 def test_numpy_array_examples():  # maybe include three?
     np_arr = np.array([1, 2, 3, 4, 5, 6, 7])
     result = struct(np_arr, examples=True)
@@ -141,6 +149,12 @@ def test_torch_tensor():
     torch_tensor = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], dtype=torch.float32)
     result = struct(torch_tensor)
     assert result == {"Tensor": ["torch.float32, shape=(2, 3)"]}
+
+
+def test_larger_torch_tensor():
+    torch_tensor = torch.Tensor(128, 3, 256, 256)
+    result = struct(torch_tensor)
+    assert result == {"Tensor": ["torch.float32, shape=(128, 3, 256, 256)"]}
 
 
 # TF Tensors
