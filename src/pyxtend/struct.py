@@ -35,8 +35,8 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         coords = list(getattr(obj, "exterior", {}).coords) if hasattr(obj, "exterior") else []
         shape = (len(coords), len(coords[0]) if coords else 0)
         return {f"{type(obj).__name__}": [f"float64, shape={shape}"]}
-    elif isinstance(obj, pd.core.groupby.generic.DataFrameGroupBy):
-        groupby_summary(obj)
+    elif obj_type_name == "DataFrameGroupBy":
+        return groupby_summary(obj)
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
             if examples:
@@ -63,46 +63,47 @@ def groupby_summary(groupby_object):
     - groupby_object: A pandas DataFrameGroupBy object.
 
     Returns:
-    None
+        - summary_data: A dictionary with many keys:
     """
     # Total number of groups and total items across all groups
     num_groups = groupby_object.ngroups
     total_items = sum(len(group) for _, group in groupby_object)
     average_items_per_group = total_items / num_groups if num_groups > 0 else 0
 
-    print(f"Total number of items: {total_items}")
-    print(f"Total number of groups: {num_groups}")
-    print(f"Average number of items per group: {average_items_per_group:.2f}\n")
-
     # Summary statistics of group sizes
     group_sizes = groupby_object.size()
-    print("Group sizes summary:")
-    print(group_sizes.describe())
-    print("\n")
 
     print("Examples of groups (first row per group):")
     # Initialize a counter
-    examples_shown = 0
-    # Iterate over the groupby object and print the first row of the first n_examples groups
-    for _, group in groupby_object:
-        print(group.head(1))
-        examples_shown += 1
-        if examples_shown >= examples_shown:
-            break
-    print("\n")
+    group_examples = {}
+    for name, group in groupby_object:
+        group_examples[name] = group.head(2)
 
     # Global aggregated statistics for numeric columns (mean, median)
-    print("Global mean values for numeric columns:")
     try:
         # Explicitly specify numeric_only=True
-        print(groupby_object.mean(numeric_only=True).mean(numeric_only=True))  # Mean of means for each group
+        global_mean_values = groupby_object.mean(numeric_only=True).mean(
+            numeric_only=True
+        )  # Mean of means for each group
     except TypeError:
-        print("No numeric columns to calculate mean.")
-    print("\n")
+        global_mean_values = "No numeric columns to calculate mean."
 
-    print("Global median values for numeric columns:")
     try:
         # Explicitly specify numeric_only=True
-        print(groupby_object.median(numeric_only=True).median(numeric_only=True))  # Median of medians for each group
+        global_median_values = groupby_object.median(numeric_only=True).median(
+            numeric_only=True
+        )  # Median of medians for each group
     except TypeError:
-        print("No numeric columns to calculate median.")
+        global_median_values = "No numeric columns to calculate median."
+
+    summary_data = {
+        "total_items": total_items,
+        "num_groups": num_groups,
+        "average_items_per_group": average_items_per_group,
+        "group_size_stats": group_sizes.describe().to_dict(),  # Convert Series to dictionary
+        "group_examples": group_examples,
+        "mean_values": global_mean_values,
+        "median_values": global_median_values,
+    }
+
+    return summary_data

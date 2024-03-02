@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 import tensorflow as tf
 import torch
 from shapely.geometry import Polygon
@@ -238,3 +239,67 @@ def test_mixed_types():
         }
     }
     assert result == expected
+
+
+# Test the groupby_summary function
+
+
+# Sample DataFrame
+data = {
+    "group": ["A", "A", "B", "B", "B"],
+    "value1": [10, 20, 5, 15, 8],
+    "value2": ["hello", "world", "foo", "bar", "baz"],
+}
+df = pd.DataFrame(data)
+groupby_obj = df.groupby("group")
+
+
+def test_groupby_summary():
+    result = struct(groupby_obj)
+
+    # Expected Results (you'll need to verify and adjust these based on your data)
+    expected = {
+        "total_items": 5,
+        "num_groups": 2,
+        "average_items_per_group": 2.5,
+        "group_size_stats": {
+            "count": 2.0,
+            "mean": 2.5,
+            "std": pytest.approx(0.707106, abs=1e-6),
+            "min": 2.0,
+            "25%": 2.25,
+            "50%": 2.5,
+            "75%": 2.75,
+            "max": 3.0,
+        },
+        "group_examples": {
+            "A": pd.DataFrame({"group": ["A", "A"], "value1": [10, 20], "value2": ["hello", "world"]}),
+            "B": pd.DataFrame({"group": ["B", "B"], "value1": [5, 15], "value2": ["foo", "bar"]}),
+        },
+        "mean_values": pd.Series({"value1": pytest.approx(12.1666, abs=1e-1)}),
+        "median_values": pd.Series({"value1": 11.5}),
+    }
+
+    # Ensure all expected keys are present
+    assert set(result.keys()) == set(expected.keys())
+
+    # Compare numeric values
+    for key in ["total_items", "num_groups", "average_items_per_group"]:
+        assert result[key] == expected[key]
+
+    # Compare 'group_size_stats'
+    assert result["group_size_stats"] == expected["group_size_stats"]
+
+    # Compare 'group_examples' (check DataFrames for equality)
+    for group_name in result["group_examples"]:
+        assert (
+            result["group_examples"][group_name]
+            .reset_index(drop=True)
+            .equals(expected["group_examples"][group_name].reset_index(drop=True))
+        )
+
+    # Compare 'mean_values' & 'median_values' (check Series for equality)
+    assert (
+        result["mean_values"].values[0] == expected["mean_values"].values[0]
+    )  # Have to do it this way because of pytest approx
+    assert result["median_values"].equals(expected["median_values"])
