@@ -104,7 +104,7 @@ def test_large_numpy_array():
     result = struct(np_arr)
     # Reponse will depend on default interger type of the platform
     expected_dtype = "float32" if np.dtype("float").itemsize == 4 else "float64"
-    assert result == {"ndarray": [f"{expected_dtype}, shape=(10000, 2, 256, 256, 3)"]}
+    assert result == {"ndarray": [f"{expected_dtype}, shape=(1000, 2, 256, 256, 3)"]}
 
 
 def test_numpy_array_examples():  # maybe include three?
