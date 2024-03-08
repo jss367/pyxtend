@@ -1,5 +1,7 @@
 import contextlib
 
+verbose = False
+
 
 def vprint(*text: str) -> None:
     """

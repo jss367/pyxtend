@@ -6,6 +6,12 @@ version = {}
 with open(os.path.join("src", "pyxtend", "_version.py")) as fp:
     exec(fp.read(), version)
 
+
+def load_requirements(filename):
+    with open(filename, "r") as file:
+        return file.read().splitlines()
+
+
 setup(
     name="pyxtend",
     version=version["__version__"],
@@ -26,4 +32,7 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     python_requires=">=3.8",
+    extras_require={
+        "test": load_requirements("requirements-test.txt"),
+    },
 )
