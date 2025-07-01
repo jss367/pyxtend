@@ -6,6 +6,14 @@ Functions to be more productive in Python.
 
 `struct` is for examining objects to understand their contents.
 
+## Usage
+
+```python
+from pyxtend import struct
+struct(obj)
+struct(obj, examples=True)
+```
+
 ## Example 1
 A simple list of integers
 
