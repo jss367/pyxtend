@@ -26,10 +26,21 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         # This works for both TensorFlow and PyTorch
         return {obj_type_name: [f"{obj.dtype}, shape={tuple(getattr(obj, 'shape', ()))}"]}
     elif obj_type_name == "ndarray":
-        inner_structure = "empty" if obj.size == 0 else struct(obj.item(0), level + 1)
         shape = tuple(obj.shape)
         dtype = obj.dtype.name
-        return {f"{type(obj).__name__}": [f"{dtype}, shape={shape}"]}
+        summary = f"{dtype}, shape={shape}"
+
+        if not examples:
+            return {f"{type(obj).__name__}": [summary]}
+
+        preview_limit = 3
+        flat = obj.flatten()
+        preview = flat[:preview_limit].tolist()
+
+        if flat.size > preview_limit:
+            preview.append(f"...{flat.size} total")
+
+        return {f"{type(obj).__name__}": [summary, *preview]}
     elif obj_type_name == "Polygon":
         coords = list(getattr(obj, "exterior", {}).coords) if hasattr(obj, "exterior") else []
         shape = (len(coords), len(coords[0]) if coords else 0)
