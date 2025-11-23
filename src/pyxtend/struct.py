@@ -3,6 +3,13 @@ from collections.abc import Iterable, Sized
 from typing import Any, Union
 
 
+def _create_ndarray_summary(obj) -> str:
+    """Create a summary string for a numpy ndarray."""
+    shape = tuple(obj.shape)
+    dtype = obj.dtype.name
+    return f"{dtype}, shape={shape}"
+
+
 def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> Union[str, dict]:
     """
     Returns the general structure of a given Python object.
@@ -26,9 +33,7 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         # This works for both TensorFlow and PyTorch
         return {obj_type_name: [f"{obj.dtype}, shape={tuple(getattr(obj, 'shape', ()))}"]}
     elif obj_type_name == "ndarray":
-        shape = tuple(obj.shape)
-        dtype = obj.dtype.name
-        summary = f"{dtype}, shape={shape}"
+        summary = _create_ndarray_summary(obj)
 
         if not examples:
             return {f"{type(obj).__name__}": [summary]}
@@ -48,32 +53,32 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
     elif obj_type_name == "DataFrameGroupBy":
         return groupby_summary(obj)
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
-        if level < limit:
-            preview_limit = 3
-            iterator = iter(obj)
-            items = list(itertools.islice(iterator, preview_limit + 1))
-            truncated = len(items) > preview_limit
-            items = items[:preview_limit]
-
-            if examples:
-                inner_structure = items
-            else:
-                inner_structure = [struct(x, level + 1, limit, examples) for x in items]
-
-            summary_entry = None
-            if isinstance(obj, Sized):
-                total = len(obj)
-                if total > preview_limit:
-                    summary_entry = f"...{total} total"
-            elif truncated:
-                summary_entry = "...more"
-
-            if summary_entry:
-                inner_structure.append(summary_entry)
-
-            return {type(obj).__name__: inner_structure}
-        else:
+        if level >= limit:
             return {type(obj).__name__: "..."}
+
+        preview_limit = 3
+        iterator = iter(obj)
+        items = list(itertools.islice(iterator, preview_limit + 1))
+        truncated = len(items) > preview_limit
+        items = items[:preview_limit]
+
+        if examples:
+            inner_structure = items
+        else:
+            inner_structure = [struct(x, level + 1, limit, examples) for x in items]
+
+        summary_entry = None
+        if isinstance(obj, Sized):
+            total = len(obj)
+            if total > preview_limit:
+                summary_entry = f"...{total} total"
+        elif truncated:
+            summary_entry = "...more"
+
+        if summary_entry:
+            inner_structure.append(summary_entry)
+
+        return {type(obj).__name__: inner_structure}
     else:
         # Handle custom objects
         attributes = {key: struct(getattr(obj, key), level + 1) for key in dir(obj) if not key.startswith("_")}
