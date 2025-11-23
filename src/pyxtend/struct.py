@@ -1,4 +1,5 @@
-from collections.abc import Iterable
+import itertools
+from collections.abc import Iterable, Sized
 from typing import Any, Union
 
 
@@ -37,12 +38,28 @@ def struct(obj: Any, level: int = 0, limit: int = 3, examples: bool = False) -> 
         return groupby_summary(obj)
     elif isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         if level < limit:
+            preview_limit = 3
+            iterator = iter(obj)
+            items = list(itertools.islice(iterator, preview_limit + 1))
+            truncated = len(items) > preview_limit
+            items = items[:preview_limit]
+
             if examples:
-                inner_structure = [x for x in obj]
+                inner_structure = items
             else:
-                inner_structure = [struct(x, level + 1) for x in obj]
-            if len(obj) > 3:
-                inner_structure = inner_structure[:3] + [f"...{len(obj)} total"]
+                inner_structure = [struct(x, level + 1, limit, examples) for x in items]
+
+            summary_entry = None
+            if isinstance(obj, Sized):
+                total = len(obj)
+                if total > preview_limit:
+                    summary_entry = f"...{total} total"
+            elif truncated:
+                summary_entry = "...more"
+
+            if summary_entry:
+                inner_structure.append(summary_entry)
+
             return {type(obj).__name__: inner_structure}
         else:
             return {type(obj).__name__: "..."}
