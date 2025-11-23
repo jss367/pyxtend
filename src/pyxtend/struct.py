@@ -1,3 +1,5 @@
+"""Module for examining Python objects to understand their structure and contents."""
+
 import itertools
 from collections.abc import Iterable, Sized
 from typing import Any, Union
