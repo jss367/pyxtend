@@ -112,7 +112,15 @@ def test_numpy_array_examples():  # maybe include three?
     result = struct(np_arr, examples=True)
     # Reponse will depend on default interger type of the platform
     expected_dtype = "int32" if np.dtype("int").itemsize == 4 else "int64"
-    assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)"]}
+    assert result == {"ndarray": [f"{expected_dtype}, shape=(7,)", 1, 2, 3, "...7 total"]}
+
+
+def test_numpy_array_examples_vs_structure():
+    np_arr = np.array([1, 2, 3])
+    without_examples = struct(np_arr, examples=False)
+    with_examples = struct(np_arr, examples=True)
+
+    assert without_examples != with_examples
 
 
 def test_dict():
